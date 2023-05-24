@@ -1,0 +1,55 @@
+#include <iostream>
+#include <chrono>
+
+using namespace std;
+using namespace std::chrono;
+
+class Node {
+public:
+    int data;
+    Node* left;
+    Node* right;
+
+    Node(int value)
+    {
+        data = value;
+        left = NULL;
+        right = NULL;
+    }
+};
+
+void inorder(Node* node)
+{
+    if (node == NULL)
+    {
+        return;
+    }
+
+    inorder(node->left);
+
+    cout << node->data << " ";
+
+    inorder(node->right);
+}
+
+int main()
+{
+    Node* root = new Node(1);
+    root->left = new Node(2);
+    root->right = new Node(3);
+    root->left->left = new Node(4);
+    root->left->right = new Node(5);
+
+    cout << "Inorder Traversal: ";
+
+    high_resolution_clock::time_point start_time = high_resolution_clock::now();
+
+    inorder(root);
+
+    high_resolution_clock::time_point end_time = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(end_time - start_time).count();
+
+    cout << "\nTime taken: " << duration << " microseconds" << endl;
+
+    return 0;
+}
