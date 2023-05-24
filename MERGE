@@ -1,0 +1,110 @@
+
+
+#include<iostream>
+#include<stdlib.h>
+#include<omp.h>
+#define MAX 100
+using namespace std;
+
+
+void mergesort(int a[], int l, int h);
+void merge(int a[], int l, int h, int m);
+
+void mergesort(int a[], int l, int h)
+{
+    int mid;
+    if (l < h)
+    {
+        mid = (l + h) / 2;
+
+        #pragma omp parallel sections 
+        {
+
+            #pragma omp section
+            {
+                mergesort(a, l, mid);
+            }
+
+            #pragma omp section
+            {
+                mergesort(a, mid + 1, h);
+            }
+        }
+
+        merge(a, l, h, mid);
+    }
+
+}
+
+void merge(int a[], int low, int high, int mid)
+{
+    int size = (high - low) + 1;
+    int i, j, k, temp[MAX];
+    i = low; k = 0; j = mid + 1;
+    // Merge the two parts into temp[]
+    while (i <= mid && j <= high)
+    {
+        if (a[i] < a[j])
+        {
+            temp[k] = a[i];
+            k++;
+            i++;
+        }
+        else
+        {
+            temp[k] = a[j];
+            k++;
+            j++;
+        }
+    }
+    /* Insert all the remaining values from i to mid into temp[] */
+    while (i <= mid)
+    {
+        temp[k] = a[i];
+        k++;
+        i++;
+    }
+    /* Insert all the remaining values from j 	to high into temp[] */
+    while (j <= high)
+    {
+        temp[k] = a[j];
+        k++;
+        j++;
+    }
+    /* Assign sorted data stored in temp[] to 	a[] */
+    for (i = low; i <= high; i++)
+    {
+        a[i] = temp[i - low];
+    }
+}
+
+
+
+
+int main()
+{
+   //int* a, n, i;
+int a[20],n,i;
+    cout << "\n enter total no of elements=>";
+    cin >> n;
+   for(i=0;i<n;i++)
+	{
+		cin>>a[i];
+	}
+   cout << "\n Unsorted Elements=>\n";
+   
+    for (i = 0; i < n; i++)
+    {
+        cout << "\t" << a[i];
+    }
+    mergesort(a, 0, n - 1);
+
+    cout << "\n sorted array is=>";
+   
+    for (i = 0; i < n; i++)
+    {
+        cout << "\t" << a[i];
+    }
+
+    return 0;
+}
