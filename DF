@@ -1,0 +1,60 @@
+#include <iostream>
+#include <omp.h>
+
+using namespace std;
+
+class Node {
+public:
+    int data;
+    Node* left;
+    Node* right;
+
+    Node(int value)
+    {
+        data = value;
+        left = NULL;
+        right = NULL;
+    }
+};
+
+void inorder(Node* node)
+{
+    if (node == NULL)
+    {
+        return;
+    }
+
+    #pragma omp task
+    inorder(node->left);
+
+    cout << node->data << " ";
+
+    #pragma omp task
+    inorder(node->right);
+}
+
+int main()
+{
+    Node* root = new Node(1);
+    root->left = new Node(2);
+    root->right = new Node(3);
+    root->left->left = new Node(4);
+    root->left->right = new Node(5);
+
+    cout << "Inorder Traversal: ";
+
+    double start_time = omp_get_wtime();
+
+    #pragma omp parallel
+    {
+        #pragma omp single nowait
+        inorder(root);
+    }
+
+    double end_time = omp_get_wtime();
+    double execution_time = end_time - start_time;
+
+    cout << "\nExecution Time: " << execution_time << " seconds" << endl;
+
+    return 0;
+}
